@@ -13,7 +13,7 @@ function formatTime(seconds) {
 
 async function getSongs(folder) {
   currfolder = folder;
-  let as = await fetch(`/${folder}/`);
+  let as = await fetch(`/Spotify-Clone/songs/${folder}/`);
   let response = await as.text();
   let div = document.createElement("div");
   div.innerHTML = response;
@@ -133,7 +133,7 @@ const playMusic = (track, pause = false) => {
 
 // Display all albums dynamically on the page
 async function displayAlbums() {
-  let as = await fetch(`/songs/`);
+  let as = await fetch(`/Spotify-Clone/songs/`);
   let response = await as.text();
   let div = document.createElement("div");
   div.innerHTML = response;
@@ -146,7 +146,7 @@ async function displayAlbums() {
       let folder = e.href.split("/").slice(-1)[0];
       console.log("Extracted folder:", folder);
 
-      let infoJsonUrl = `/songs/${folder}/info.json`;
+      let infoJsonUrl = `/Spotify-Clone/songs/${folder}/info.json`;
       try {
         let as = await fetch(infoJsonUrl);
         if (!as.ok) throw new Error(`⚠️ info.json not found for ${folder}`);
@@ -188,7 +188,7 @@ async function displayAlbums() {
 }
 
 async function main() {
-  await getSongs(`/songs/Glory/`);
+  await getSongs(`/Spotify-Clone/songs/Glory/`);
   songs = [...songsList]; // Ensure songs get updated
   if (!songs.length) return;
 
