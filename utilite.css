@@ -1,0 +1,312 @@
+*{
+    font-family: "Roboto", serif;
+}
+
+.flex{
+    display: flex;
+
+   
+}
+.justify{
+    justify-content: center;
+}
+.align{
+    align-items: center;
+}
+.bg-black{
+    background-color: black;
+    color: white;
+}
+.invert{
+    filter: invert(1);
+}
+.bg-gray{
+    background-color: #121212;
+}
+.rounded{
+    border-radius: 5px;
+}
+.m-1{
+    margin: 5px;
+}
+.p-1{
+    padding: 2px 10px;
+}
+.underline{
+    text-decoration: none;
+}
+.button {
+    font-family: Arial, sans-serif;
+    font-size: 16px;
+    padding: 10px 20px;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+    display: flex;
+    gap: 15px;
+}
+/* Sign Up Button */
+.signup {
+    font-family: "Roboto", serif;
+    font-weight: bold;
+    background-color: #1DB954; /* Spotify Green */
+    color: black;
+    border: none;
+}
+
+.signup:hover {
+    box-shadow: #16ce5a 0px 0px 10px;
+    background-color: #16ce5a;
+    transform: scale(1.05);
+    transition: all 0.1s ease;
+    /* border: 2px solid white; */
+} 
+
+
+/* Login Button */
+.login {
+    font-weight: bold;
+    background-color: transparent;
+    color: white;
+    border: 2px solid white;
+}
+
+.login:hover {
+    background-color: white;
+    color: black;
+}
+/* Dark Theme Scrollbar */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    background: #121212; /* Dark background */
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #55535362; /* Spotify Green */
+    border-radius: 5px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #252525;
+}
+
+
+.playbar{
+    position: absolute;
+    bottom: 10px;
+    filter: invert(1);
+    background: #DDDede;
+    border-radius: 10px;
+    /* width: 90%; */
+    padding: 13px 15px;
+    width: calc(100% - 50px);
+    min-height: 50px;
+}
+.songbutton{
+    
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    padding: 10px;
+}
+.songbutton img{
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+}
+.seekbar{
+    cursor: pointer;
+    background-color: black;
+    margin: 2px;
+    height: 4px;
+    width: calc(100% - 90px);
+    position: absolute;
+    bottom: 5px;   
+
+} 
+.circle{
+    width: 13px;
+    height: 13px;
+    border-radius: 13px;
+    background-color: black;
+    position: relative;
+    bottom: 6px;
+    left: 0%;
+    transition: left 0.4s ease;
+}
+.aboveBar{
+    gap: 7px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.songinfo, .songtime{
+    color: black;
+    font-size: 12px;
+    padding: 0 12px;
+    font-weight: bold;
+
+}
+.songinfo{
+    flex-wrap: wrap;
+    display: flex;
+    /* border: 2px solid; */
+    width: 224px;
+}
+.volTime{
+    gap: 10px;
+    border: 1px solid black;
+    justify-content: space-between;
+    align-items: center;
+    display: flex;
+    gap: 10px;
+}
+.volume{
+    gap: 5px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+/* Style the range input track */
+.range input[type="range"] {
+    appearance: none;
+    width: 100px;
+    height: 5px;
+    background: #ddd;
+    border-radius: 5px;
+    outline: none;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  
+  /* When user hovers over the slider */
+  .range input[type="range"]:hover {
+    background: #777575;
+  }
+  
+  /* Style the thumb (the draggable circle) for Chrome, Safari, Edge, Opera */
+  .range input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    background: #1db954; /* Green */
+    border: 1px solid white;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: transform 0.2s;
+     
+  }
+  .range input[type="range"]:hover::-webkit-slider-thumb {
+    opacity: 1;
+  }
+  /* Make the thumb bigger when dragging */
+  .range input[type="range"]:active::-webkit-slider-thumb {
+    transform: scale(1.2);
+  }
+  
+  /* Firefox Specific Styling */
+  .range input[type="range"]::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    background: #1fdf64;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+  
+  /* Hide the default range track in Firefox */
+  .range input[type="range"]::-moz-range-track {
+    background: #ddd;
+    height: 5px;
+    border-radius: 5px;
+  }
+  
+
+@media (max-width: 1500px) {
+    .playbar{
+        bottom: 2%;
+        position: absolute;
+        margin-left: 15px;
+        /* width: 93%; */
+        padding: 10px;
+        z-index: 4;
+      
+
+    }
+    .card-container{
+        max-height: 75vh;
+    }
+    .songinfo, .songtime{
+        
+        font-size: 9px;
+
+    }
+    .songtime {
+        /* border: 2px solid; */
+        width: 76px;
+    }
+    .songinfo{
+        width: 112px;
+    }
+    .songbutton img{
+        width: 24px;
+        height: 24px;
+    }
+    .seekbar{
+        margin-left: 25px;
+        /* width: 85%; */
+    }
+    .button{
+        font-size: 10px;
+    }
+    .volume  input{
+        display: none;
+    }
+    .volume img{
+        display: none;
+    }
+    .volTime{
+        border: none;
+       display: inline-block;
+    }   
+}
+@media (min-width: 650px) {
+
+    .aboveBar{
+        padding: 0 10px;
+        gap: 5px;
+        justify-content: space-between;
+    }
+    .volume  input{
+        display: block;
+    }
+    .volume img{
+        display: block;
+    }
+    .volTime{
+        border: none;
+       display: flex;
+    }   
+    
+}
+@media (max-width:400px){
+    .songinfo, .songtime{
+        font-size: 8px;
+    }
+    .songtime {
+        width: 60px;
+    }
+    .songinfo{
+        width: 100px;
+    }
+
+}
