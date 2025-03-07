@@ -13,7 +13,7 @@ function formatTime(seconds) {
 
 async function getSongs(folder) {
   currfolder = folder;
-  let as = await fetch(`/${folder}/`);
+  let as = await fetch(`https://spotify-clone-seven-psi.vercel.app/${folder}/`);
   let response = await as.text();
   let div = document.createElement("div");
   div.innerHTML = response;
