@@ -173,48 +173,22 @@ const playMusic = (track, pause = false) => {
 
 // Display all albums dynamically on the page
 async function displayAlbums() {
-  let as = await fetch(`/songs/`);
-  let response = await as.text();
-  let div = document.createElement("div");
-  div.innerHTML = response;
-  let anchors = div.getElementsByTagName("a");
-  let cardContainer = document.querySelector(".cardContainer");
-  console.log("cardContainer:", cardContainer);
-  cardContainer.innerHTML = ""; // Clear existing content to prevent duplication
-
-  for (let e of anchors) {
-    if (e.href.includes("/songs")) {
-      let folder = e.href.split("/").slice(-1)[0];
-      console.log("Extracted folder:", folder);
-
-      let infoJsonUrl = `/songs/${folder}/info.json`;
-      try {
-        let as = await fetch(infoJsonUrl);
-        if (!as.ok) throw new Error(`⚠️ info.json not found for ${folder}`);
-        let responses = await as.json();
-
-        // ✅ Dynamically create a card with the correct folder name
-        let cardHTML = `
-          <div data-folder="${folder}" class="card m-1 rounded">
-              <div class="play">
-                  <svg width="50" height="50" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                      <circle cx="50" cy="50" r="45" fill="#1fdf64" />
-                      <polygon points="40,30 40,70 70,50" fill="black" />
-                  </svg>
-              </div>
-              <div class="card-img">
-                  <img src="songs/${folder}/${responses.imgCover}" alt="${responses.title}">
-              </div>
-              <h2>${responses.title}</h2>
-              <p>${responses.artist}</p>
-          </div>`;
-
-        cardContainer.insertAdjacentHTML("beforeend", cardHTML);
-      } catch (error) {
-        console.error("❌ Error fetching JSON:", error);
-      }
+    const cardContainer = document.querySelector(".cardContainer");
+    cardContainer.innerHTML = "";
+    for (const albumKey in albumsManifest) {
+        const album = albumsManifest[albumKey];
+        cardContainer.innerHTML += `<div data-folder="${albumKey}" class="card">
+      <div class="play">
+        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" fill="#1DB954">
+          <circle cx="24" cy="24" r="24" fill="#1DB954" />
+          <path d="M18 34V14L34 24L18 34Z" fill="black" />
+        </svg>
+      </div>
+      <img src="./songs/${albumKey}/cover.jpg" alt="">
+      <h2>${album.title}</h2>
+      <p>${album.description}</p>
+    </div>`;
     }
-  }
 
   // ✅ Attach event listener **AFTER** dynamically adding cards
   document.querySelectorAll(".card").forEach((card) => {
