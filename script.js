@@ -8,7 +8,7 @@ console.log("code running");
 
 //  manifest for songs and album metadata
 const songsManifest = {
-  "songs/Glory": [
+  "Glory": [
       "Bonita - Yo Yo Honey Singh, The Shams.mp3",
       "Jatt Mehkma - Yo Yo Honey Singh, Leo Grewal.mp3",
       "Maniac - Yo Yo Honey Singh.mp3",
