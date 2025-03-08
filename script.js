@@ -233,8 +233,9 @@ async function main() {
 
   playMusic(songs[0], true); // stop the autoplay
 
-  //  Display all ablums dynamically on the pages
-  displayAlbums();
+   // ✅ Check before calling displayAlbums()
+    console.log("📌 Calling displayAlbums() now...");
+    displayAlbums();
 
   document.querySelector("#play").addEventListener("click", () => {
     if (currentSong.paused) {
