@@ -173,7 +173,7 @@ const playMusic = (track, pause = false) => {
 console.log("Checking if .cardContainer exists:", document.querySelector(".cardContainer"));
 
 // Display all albums dynamically on the page
-async function displayAlbums() {
+ function displayAlbums() {
   console.log("displayAlbums function is running!")
     const cardContainer = document.querySelector(".cardContainer");
     
@@ -227,7 +227,7 @@ async function displayAlbums() {
 async function main() {
   console.log("Albums Manifest:", albumsManifest);
 
-  await getSongs(`/songs/Glory/`);
+   getSongs(`/songs/Glory/`);
   songs = [...songsList]; // Ensure songs get updated
   if (!songs.length) return;
 
