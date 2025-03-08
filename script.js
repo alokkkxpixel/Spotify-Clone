@@ -4,6 +4,8 @@ let songs = [];
 let currfolder;
 let currentSong = new Audio();
 
+console.log("code running");
+
 //  manifest for songs and album metadata
 const songsManifest = {
   "songs/Glory": [
