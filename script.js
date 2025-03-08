@@ -173,7 +173,7 @@ const playMusic = (track, pause = false) => {
 console.log("Checking if .cardContainer exists:", document.querySelector(".cardContainer"));
 
 // Display all albums dynamically on the page
- function displayAlbums() {
+async function displayAlbums() {
   console.log("displayAlbums function is running!")
     const cardContainer = document.querySelector(".cardContainer");
     
@@ -226,17 +226,21 @@ console.log("Checking if .cardContainer exists:", document.querySelector(".cardC
 
 async function main() {
   console.log("Albums Manifest:", albumsManifest);
+    console.log("📢 Checking if main() is running...");
+    console.log("✅ main() started");
+    await getSongs(`/songs/Glory/`);
+  songs = [...songsList];
+    console.log("🎵 Songs Loaded:", songs); // Debugging songs array
 
-   getSongs(`/songs/Glory/`);
-  songs = [...songsList]; // Ensure songs get updated
-  if (!songs.length) return;
+    if (!songs.length) {
+        console.warn("⚠️ No songs found, stopping execution!");
+        return;
+    }
 
-  playMusic(songs[0], true); // stop the autoplay
+    playMusic(songs[0], true); // Stop autoplay
 
-   // ✅ Check before calling displayAlbums()
     console.log("📌 Calling displayAlbums() now...");
     displayAlbums();
-
   document.querySelector("#play").addEventListener("click", () => {
     if (currentSong.paused) {
       currentSong.play();
