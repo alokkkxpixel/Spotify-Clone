@@ -174,7 +174,7 @@ console.log("Checking if .cardContainer exists:", document.querySelector(".cardC
 
 // Display all albums dynamically on the page
 async function displayAlbums() {
-  console.log("displayAlbums() function is running!"")
+  console.log("displayAlbums function is running!"")
     const cardContainer = document.querySelector(".cardContainer");
     
     if (!cardContainer) {
