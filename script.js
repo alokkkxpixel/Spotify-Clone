@@ -79,6 +79,7 @@ function formatTime(seconds) {
 }
 
 async function getSongs(folder) {
+ 
   currfolder = folder;
   songsList = songsManifest[folder] || [];  // ✅ Changed: Fetch songs from the songsManifest instead of using fetch()
 
@@ -97,6 +98,26 @@ async function getSongs(folder) {
           </div>
         </li>`;
   }
+
+    try {
+        console.log(`📂 Fetching songs from: ${folder}`);
+
+        const response = await fetch(`${folder}/songs.json`);
+        console.log("📢 Fetch Response:", response);
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log("🎵 Songs fetched successfully:", data);
+
+        songsList = data.songs;
+    } catch (error) {
+        console.error("❌ Error fetching songs:", error);
+        songsList = []; // Prevent undefined errors
+    }
+
 
   // ✅ Attach event listeners after updating the list
   document.querySelectorAll(".song-item").forEach((item) => {
