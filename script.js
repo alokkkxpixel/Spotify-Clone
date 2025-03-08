@@ -78,9 +78,20 @@ function formatTime(seconds) {
   return `${String(minutes).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
 }
 
-async function getSongs(folder) {
-    console.log(`📂 Fetching songs from: ${folder}`);
 
+async function getSongs(folder) {
+     console.log(`📂 Fetching songs from: ${folder}`);
+    console.log("📜 songsManifest:", songsManifest);
+
+    if (!songsManifest || typeof songsManifest !== "object") {
+        console.error("❌ songsManifest is missing or not an object!");
+        return;
+    }
+
+    if (!(folder in songsManifest)) {
+        console.warn(`⚠️ Folder "${folder}" not found in songsManifest!`);
+        return;
+    }
     // ✅ Get songs from `songsManifest` instead of fetching a file
     songsList = songsManifest[folder] || [];
 
