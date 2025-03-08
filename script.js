@@ -177,6 +177,7 @@ async function displayAlbums() {
   div.innerHTML = response;
   let anchors = div.getElementsByTagName("a");
   let cardContainer = document.querySelector(".cardContainer");
+  console.log("cardContainer:", cardContainer);
   cardContainer.innerHTML = ""; // Clear existing content to prevent duplication
 
   for (let e of anchors) {
