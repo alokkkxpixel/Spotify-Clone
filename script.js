@@ -79,46 +79,38 @@ function formatTime(seconds) {
 }
 
 async function getSongs(folder) {
- 
-  currfolder = folder;
-  songsList = songsManifest[folder] || [];  // ✅ Changed: Fetch songs from the songsManifest instead of using fetch()
+    console.log(`📂 Fetching songs from: ${folder}`);
 
-  let songUl = document.querySelector(".songList ul");
-  songUl.innerHTML = ""; // Clear previous list
+    // ✅ Get songs from `songsManifest` instead of fetching a file
+    songsList = songsManifest[folder] || [];
 
-  for (const song of songsList) {
-      songUl.innerHTML += `
-        <li class="song-item">
-          <img class="invert music" src="svgs/music.svg" alt="">
-          <div class="info">
-            <div class="song-name">${song}</div>
-          </div>
-          <div class="playnow">
-            <img class="invert play-btn" src="svgs/play.svg" alt="">
-          </div>
-        </li>`;
-  }
-
-    try {
-        console.log(`📂 Fetching songs from: ${folder}`);
-
-        const response = await fetch(`${folder}/songs.json`);
-        console.log("📢 Fetch Response:", response);
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
-        const data = await response.json();
-        console.log("🎵 Songs fetched successfully:", data);
-
-        songsList = data.songs;
-    } catch (error) {
-        console.error("❌ Error fetching songs:", error);
-        songsList = []; // Prevent undefined errors
+    if (songsList.length === 0) {
+        console.warn("⚠️ No songs found in songsManifest, stopping execution!");
+        return;
     }
 
+    console.log("🎵 Songs fetched successfully:", songsList);
 
+    let songUl = document.querySelector(".songList ul");
+    if (!songUl) {
+        console.error("❌ songList <ul> NOT FOUND in DOM!");
+        return;
+    }
+
+    // ✅ Clear previous song list and update UI
+    songUl.innerHTML = "";
+    for (const song of songsList) {
+        songUl.innerHTML += `
+            <li class="song-item">
+                <img class="invert music" src="svgs/music.svg" alt="">
+                <div class="info">
+                    <div class="song-name">${song}</div>
+                </div>
+                <div class="playnow">
+                    <img class="invert play-btn" src="svgs/play.svg" alt="">
+                </div>
+            </li>`;
+    }
   // ✅ Attach event listeners after updating the list
   document.querySelectorAll(".song-item").forEach((item) => {
       item.addEventListener("click", () => {
