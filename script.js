@@ -175,33 +175,53 @@ console.log("Checking if .cardContainer exists:", document.querySelector(".cardC
 // Display all albums dynamically on the page
 async function displayAlbums() {
     const cardContainer = document.querySelector(".cardContainer");
-    cardContainer.innerHTML = "";
-    for (const albumKey in albumsManifest) {
-        const album = albumsManifest[albumKey];
-        cardContainer.innerHTML += `<div data-folder="${albumKey}" class="card">
-      <div class="play">
-        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" fill="#1DB954">
-          <circle cx="24" cy="24" r="24" fill="#1DB954" />
-          <path d="M18 34V14L34 24L18 34Z" fill="black" />
-        </svg>
-      </div>
-      <img src="./songs/${albumKey}/cover.jpg" alt="">
-      <h2>${album.title}</h2>
-      <p>${album.description}</p>
-    </div>`;
+    
+    if (!cardContainer) {
+        console.error("❌ cardContainer NOT FOUND!");
+        return; // Stop execution if cardContainer is missing
     }
 
-  // ✅ Attach event listener **AFTER** dynamically adding cards
-  document.querySelectorAll(".card").forEach((card) => {
-    card.addEventListener("click", async (event) => {
-      let folder = event.currentTarget.dataset.folder;
-      console.log(`📂 Loading songs from: ${folder}`);
-      await getSongs(`songs/${folder}`);
-      songs = [...songsList]; // Update songs list
-      playMusic(songs[0]); // Play the first song
+    console.log("✅ cardContainer found!", cardContainer);
+    
+    cardContainer.innerHTML = ""; // Clear existing albums
+
+    for (const albumKey in albumsManifest) {
+        const album = albumsManifest[albumKey];
+        
+        console.log(`🎵 Adding album: ${albumKey}`, album); // Debug each album
+        
+        cardContainer.innerHTML += `
+        <div data-folder="${albumKey}" class="card">
+            <div class="play">
+                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="24" cy="24" r="24" fill="#1DB954" />
+                    <path d="M18 34V14L34 24L18 34Z" fill="black" />
+                </svg>
+            </div>
+            <img src="./songs/${albumKey}/cover.jpg" alt="${album.title}">
+            <h2>${album.title}</h2>
+            <p>${album.artist}</p>
+        </div>`;
+    }
+
+    console.log("✅ Finished adding albums. Total:", Object.keys(albumsManifest).length);
+
+    // ✅ Check if album cards exist after being added
+    const cards = document.querySelectorAll(".card");
+    console.log("📌 Total album cards in DOM:", cards.length);
+
+    // ✅ Attach event listener **AFTER** dynamically adding cards
+    document.querySelectorAll(".card").forEach((card) => {
+        card.addEventListener("click", async (event) => {
+            let folder = event.currentTarget.dataset.folder;
+            console.log(`📂 Loading songs from: ${folder}`);
+            await getSongs(`songs/${folder}`);
+            songs = [...songsList]; // Update songs list
+            playMusic(songs[0]); // Play the first song
+        });
     });
-  });
 }
+
 
 async function main() {
   console.log("Albums Manifest:", albumsManifest);
