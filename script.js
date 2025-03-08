@@ -1,76 +1,17 @@
 // Current song
 let songsList = [];
 let songs = [];
-let currfolder ;
+let currfolder;
 let currentSong = new Audio();
-
-console.log("code running");
-
-//  manifest for songs and album metadata
-const songsManifest = {
-  "Glory": [
-      "Bonita - Yo Yo Honey Singh, The Shams.mp3",
-      "Jatt Mehkma - Yo Yo Honey Singh, Leo Grewal.mp3",
-      "Maniac - Yo Yo Honey Singh.mp3",
-      "Millionaire-Yo Yo Honey Singh, Leo Grewal.mp3",
-      "Payal - Yo Yo Honey Singh, Paradox,.mp3",
-      "Rap God - Honey Singh.mp3"
-  ],
-  "Divine": [
-      "100 Million - DIVINE Karan Aujla.mp3",
-      "Hisaab - DIVINE Karan Aujla.mp3",
-      "Nothing Lasts - DIVINE Karan Aujla.mp3",
-      "Straight Ballin - DIVINE Karan Aujla.mp3",
-      "Top Class  Overseas - DIVINE Karan Aujla.mp3",
-      
-  ],
-  "yjhd": [
-      "Balam Pichkari.mp3",
-      "Badtameez Dil - Benny Dayal Shefali Alvares.mp3",
-      "Diliwali Girlfriends.mp3",
-      "ILAHI - Arijit Singh, Pritam, Amitbh Bhattacharya.mp3",
-      "Kabira - Tochi Raina Rekha Bhardwaj.mp3",
-  ],
-  "Krsna":[
-    "Hola Amigo - KRNA, Seedhe Maut, Umair.mp3",
-    "KRNA, Flexus, KRNA, Flexus - Blowing Up.mp3",
-    "KRNA, KRNA, KRNA, Enigma - No Cap.mp3",
-    "KRNA, KRNA, KRNA, Kabu Beats - I Guess.mp3",
+//  make Loader on site
+document.addEventListener("DOMContentLoaded", function () {
+  setTimeout(() => {
+      document.getElementById("loader").classList.add("hidden");
+      document.querySelector(".container").style.display = "flex";
+  }, 4000);
+});
 
 
-  ],
-
-
-};
-
-const albumsManifest = {
-  "Glory": {
-          "title": "Glory",
-          "artist": "YO Yo Honey Singh",
-          "album": "Glory",
-          "imgCover": "/Glory-cover.webp"
-
-
-  },
-  "Krsna": {
-    "title": "FAR FROM OVER",
-    "artist": "KR$NA",
-    "album": "NGL",
-    "imgCover": "/Krsna.webp"
-  },
-  "Divine": {
-    "title": "Street Dreams",
-    "artist": "Divine",
-    "album": "Street Dreams",
-    "imgCover": "/streetDreams.webp",
-  },
-  "yjhd": {
-    "title": "Yeh Jawaani Hai Deewani",
-    "artist": "Pritam",
-    "album": "Yeh Jawaani Hai Deewani",
-    "imgCover": "/yjhd-cover.webp",
-  },
-};
 function formatTime(seconds) {
   if (isNaN(seconds) || seconds < 0) return "00:00";
   let minutes = Math.floor(seconds / 60);
@@ -78,75 +19,72 @@ function formatTime(seconds) {
   return `${String(minutes).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
 }
 
-
 async function getSongs(folder) {
   currfolder = folder;
+  let as = await fetch(`http://127.0.0.1:5500/${folder}/`);
+  let response = await as.text();
+  let div = document.createElement("div");
+  div.innerHTML = response;
+  let listItems = div.getElementsByTagName("li");
+  songsList = [];
 
-    console.log(`📂 Fetching songs from: ${folder}`);
+  for (let li of listItems) {
+    let anchor = li.querySelector("a");
+    if (anchor) {
+      let songName = decodeURIComponent(anchor.href.split("/").pop());
 
-    try {
-        // Load songsManifest from JSON instead of hardcoded object
-        const response = await fetch("songsManifest.json");
-        const songsManifest = await response.json();
-
-        if (!(folder in songsManifest)) {
-            console.warn(`⚠️ Folder "${folder}" not found in songsManifest!`);
-            return;
-        }
-
-        songsList = songsManifest[folder] || [];
-
-        if (songsList.length === 0) {
-            console.warn("⚠️ No songs found in songsManifest!");
-            return;
-        }
-
-        console.log("🎵 Songs fetched successfully:", songsList);
-
-        let songUl = document.querySelector(".songList ul");
-        if (!songUl) {
-            console.error("❌ songList <ul> NOT FOUND in DOM!");
-            return;
-        }
-
-        // ✅ Clear previous song list and update UI
-        songUl.innerHTML = "";
-        for (const song of songsList) {
-            songUl.innerHTML += `
-                <li class="song-item">
-                    <img class="invert music" src="svgs/music.svg" alt="">
-                    <div class="info">
-                        <div class="song-name">${song}</div>
-                    </div>
-                    <div class="playnow">
-                        <img class="invert play-btn" src="svgs/play.svg" alt="">
-                    </div>
-                </li>`;
-        }
-
-        // ✅ Attach event listeners after updating the list
-        document.querySelectorAll(".song-item").forEach((item) => {
-            item.addEventListener("click", () => {
-                let songName = item.querySelector(".song-name").innerText.trim();
-                if (currentSong.src.includes(songName)) {
-                    if (currentSong.paused) {
-                        currentSong.play();
-                        item.querySelector(".play-btn").src = "svgs/pause.svg";
-                    } else {
-                        currentSong.pause();
-                        item.querySelector(".play-btn").src = "svgs/play.svg";
-                    }
-                } else {
-                    playMusic(songName);
-                }
-            });
-        });
-    } catch (error) {
-        console.error("❌ Error loading songs:", error);
+      // ✅ Filter out non-song items
+      if (
+        songName.toLowerCase().endsWith(".mp3") ||
+        songName.toLowerCase().endsWith(".wav")
+      ) {
+        songsList.push(songName);
+      }
     }
+  }
+
+  // ✅ Prevent empty entries
+  songsList = songsList.filter((song) => song.trim() !== "");
+
+  let songUl = document.querySelector(".songList ul");
+  songUl.innerHTML = ""; // Clear previous list
+
+  for (const song of songsList) {
+    songUl.innerHTML += `
+      <li class="song-item">
+        <img class="invert music" src="svgs/music.svg" alt="">
+        <div class="info">
+          <div class="song-name">${song}</div>
+          
+        </div>
+        <div class="playnow">
+          
+          <img id="#play" class="invert play-btn" src="svgs/play.svg" alt="">
+        </div>
+      </li>`;
+  }
+
+  // Attach event listeners after updating the list
+  document.querySelectorAll(".song-item").forEach((item) => {
+    item.addEventListener("click", () => {
+      let songName = item.querySelector(".song-name").innerText.trim();
+      // Check if it's the same song and toggle pause/play
+      if (currentSong.src.includes(songName)) {
+        if (currentSong.paused) {
+          currentSong.play();
+          document.querySelector("#play").src = "svgs/pause.svg";
+          item.querySelector(".play-btn").src = "svgs/pause.svg";
+        } else {
+          currentSong.pause();
+          document.querySelector("#play").src = "svgs/play.svg";
+          item.querySelector(".play-btn").src = "svgs/play.svg";
+        }
+      } else {
+        playMusic(songName); // Start new song
+      }
+    });
+  });
 }
-
-
 
 // Attach event listener to each song item
 document.querySelectorAll(".song-item").forEach((item) => {
@@ -200,79 +138,72 @@ const playMusic = (track, pause = false) => {
   document.querySelector(".songinfo").innerHTML = decodeURI(track);
   document.querySelector(".songtime").innerHTML = "00:00 / 00:00";
 };
-console.log("Checking if .cardContainer exists:", document.querySelector(".cardContainer"));
 
 // Display all albums dynamically on the page
 async function displayAlbums() {
-    console.log("displayAlbums function is running!");
+  let as = await fetch(`http://127.0.0.1:5500/songs/`);
+  let response = await as.text();
+  let div = document.createElement("div");
+  div.innerHTML = response;
+  let anchors = div.getElementsByTagName("a");
+  let cardContainer = document.querySelector(".cardContainer");
+  cardContainer.innerHTML = ""; // Clear existing content to prevent duplication
 
-    const cardContainer = document.querySelector(".cardContainer");
+  for (let e of anchors) {
+    if (e.href.includes("/songs")) {
+      let folder = e.href.split("/").slice(-1)[0];
+      console.log("Extracted folder:", folder);
 
-    if (!cardContainer) {
-        console.error("❌ cardContainer NOT FOUND!");
-        return;
+      let infoJsonUrl = `http://127.0.0.1:5500/songs/${folder}/info.json`;
+      try {
+        let as = await fetch(infoJsonUrl);
+        if (!as.ok) throw new Error(`⚠️ info.json not found for ${folder}`);
+        let responses = await as.json();
+
+        // ✅ Dynamically create a card with the correct folder name
+        let cardHTML = `
+          <div data-folder="${folder}" class="card m-1 rounded">
+              <div class="play">
+                  <svg width="50" height="50" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="50" cy="50" r="45" fill="#1fdf64" />
+                      <polygon points="40,30 40,70 70,50" fill="black" />
+                  </svg>
+              </div>
+              <div class="card-img">
+                  <img src="songs/${folder}/${responses.imgCover}" alt="${responses.title}">
+              </div>
+              <h2>${responses.title}</h2>
+              <p>${responses.artist}</p>
+          </div>`;
+
+        cardContainer.insertAdjacentHTML("beforeend", cardHTML);
+      } catch (error) {
+        console.error("❌ Error fetching JSON:", error);
+      }
     }
+  }
 
-    console.log("✅ cardContainer found!", cardContainer);
-    
-    cardContainer.innerHTML = ""; // Clear existing albums
-
-    for (const albumKey in albumsManifest) {
-        const album = albumsManifest[albumKey];
-
-        console.log(`🎵 Adding album: ${albumKey}`, album);
-
-        cardContainer.innerHTML += `
-        <div data-folder="${albumKey}" class="card">
-            <div class="play">
-                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="24" cy="24" r="24" fill="#1DB954" />
-                    <path d="M18 34V14L34 24L18 34Z" fill="black" />
-                </svg>
-            </div>
-            <img src="songs/${albumKey}/cover.jpg" alt="${album.title}">
-            <h2>${album.title}</h2>
-            <p>${album.artist}</p>
-        </div>`;
-    }
-
-    console.log("✅ Finished adding albums. Total:", Object.keys(albumsManifest).length);
-
-    // ✅ Attach event listener **AFTER** dynamically adding cards
-    document.querySelectorAll(".card").forEach((card) => {
-        card.addEventListener("click", async (event) => {
-            let folder = event.currentTarget.dataset.folder;
-            console.log(`📂 Loading songs from: ${folder}`);
-            await getSongs(folder);
-            songs = [...songsList];
-            playMusic(songs[0]);
-        });
+  // ✅ Attach event listener **AFTER** dynamically adding cards
+  document.querySelectorAll(".card").forEach((card) => {
+    card.addEventListener("click", async (event) => {
+      let folder = event.currentTarget.dataset.folder;
+      console.log(`📂 Loading songs from: ${folder}`);
+      await getSongs(`songs/${folder}`);
+      songs = [...songsList]; // Update songs list
+      playMusic(songs[0]); // Play the first song
     });
+  });
 }
 
-
-
 async function main() {
-    console.log("📢 Checking if main() is running...");
+  await getSongs(`/songs/yjhd/`);
+  songs = [...songsList]; // Ensure songs get updated
+  if (!songs.length) return;
 
-    try {
-        await displayAlbums(); // ✅ Display albums dynamically
-        await getSongs("Glory"); // ✅ Load a default album
+  playMusic(songs[0], true); // stop the autoplay
 
-        songs = [...songsList];
-
-        if (!songs.length) {
-            console.warn("⚠️ No songs found, stopping execution!");
-            return;
-        }
-
-        playMusic(songs[0], true); // Stop autoplay
-
-    } catch (error) {
-        console.error("❌ Error in main():", error);
-    }
-
-
+  //  Display all ablums dynamically on the pages
+  displayAlbums();
 
   document.querySelector("#play").addEventListener("click", () => {
     if (currentSong.paused) {
