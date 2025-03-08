@@ -204,6 +204,8 @@ async function displayAlbums() {
 }
 
 async function main() {
+  console.log("Albums Manifest:", albumsManifest);
+
   await getSongs(`/songs/Glory/`);
   songs = [...songsList]; // Ensure songs get updated
   if (!songs.length) return;
