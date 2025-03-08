@@ -80,66 +80,70 @@ function formatTime(seconds) {
 
 
 async function getSongs(folder) {
-     console.log(`📂 Fetching songs from: ${folder}`);
-    console.log("📜 songsManifest:", songsManifest);
+    console.log(`📂 Fetching songs from: ${folder}`);
 
-    if (!songsManifest || typeof songsManifest !== "object") {
-        console.error("❌ songsManifest is missing or not an object!");
-        return;
+    try {
+        // Load songsManifest from JSON instead of hardcoded object
+        const response = await fetch("songsManifest.json");
+        const songsManifest = await response.json();
+
+        if (!(folder in songsManifest)) {
+            console.warn(`⚠️ Folder "${folder}" not found in songsManifest!`);
+            return;
+        }
+
+        songsList = songsManifest[folder] || [];
+
+        if (songsList.length === 0) {
+            console.warn("⚠️ No songs found in songsManifest!");
+            return;
+        }
+
+        console.log("🎵 Songs fetched successfully:", songsList);
+
+        let songUl = document.querySelector(".songList ul");
+        if (!songUl) {
+            console.error("❌ songList <ul> NOT FOUND in DOM!");
+            return;
+        }
+
+        // ✅ Clear previous song list and update UI
+        songUl.innerHTML = "";
+        for (const song of songsList) {
+            songUl.innerHTML += `
+                <li class="song-item">
+                    <img class="invert music" src="svgs/music.svg" alt="">
+                    <div class="info">
+                        <div class="song-name">${song}</div>
+                    </div>
+                    <div class="playnow">
+                        <img class="invert play-btn" src="svgs/play.svg" alt="">
+                    </div>
+                </li>`;
+        }
+
+        // ✅ Attach event listeners after updating the list
+        document.querySelectorAll(".song-item").forEach((item) => {
+            item.addEventListener("click", () => {
+                let songName = item.querySelector(".song-name").innerText.trim();
+                if (currentSong.src.includes(songName)) {
+                    if (currentSong.paused) {
+                        currentSong.play();
+                        item.querySelector(".play-btn").src = "svgs/pause.svg";
+                    } else {
+                        currentSong.pause();
+                        item.querySelector(".play-btn").src = "svgs/play.svg";
+                    }
+                } else {
+                    playMusic(songName);
+                }
+            });
+        });
+    } catch (error) {
+        console.error("❌ Error loading songs:", error);
     }
-
-    if (!(folder in songsManifest)) {
-        console.warn(`⚠️ Folder "${folder}" not found in songsManifest!`);
-        return;
-    }
-    // ✅ Get songs from `songsManifest` instead of fetching a file
-    songsList = songsManifest[folder] || [];
-
-    if (songsList.length === 0) {
-        console.warn("⚠️ No songs found in songsManifest, stopping execution!");
-        return;
-    }
-
-    console.log("🎵 Songs fetched successfully:", songsList);
-
-    let songUl = document.querySelector(".songList ul");
-    if (!songUl) {
-        console.error("❌ songList <ul> NOT FOUND in DOM!");
-        return;
-    }
-
-    // ✅ Clear previous song list and update UI
-    songUl.innerHTML = "";
-    for (const song of songsList) {
-        songUl.innerHTML += `
-            <li class="song-item">
-                <img class="invert music" src="svgs/music.svg" alt="">
-                <div class="info">
-                    <div class="song-name">${song}</div>
-                </div>
-                <div class="playnow">
-                    <img class="invert play-btn" src="svgs/play.svg" alt="">
-                </div>
-            </li>`;
-    }
-  // ✅ Attach event listeners after updating the list
-  document.querySelectorAll(".song-item").forEach((item) => {
-      item.addEventListener("click", () => {
-          let songName = item.querySelector(".song-name").innerText.trim();
-          if (currentSong.src.includes(songName)) {
-              if (currentSong.paused) {
-                  currentSong.play();
-                  item.querySelector(".play-btn").src = "svgs/pause.svg";
-              } else {
-                  currentSong.pause();
-                  item.querySelector(".play-btn").src = "svgs/play.svg";
-              }
-          } else {
-              playMusic(songName);
-          }
-      });
-  });
 }
+
 
 
 // Attach event listener to each song item
@@ -198,12 +202,13 @@ console.log("Checking if .cardContainer exists:", document.querySelector(".cardC
 
 // Display all albums dynamically on the page
 async function displayAlbums() {
-  console.log("displayAlbums function is running!")
+    console.log("displayAlbums function is running!");
+
     const cardContainer = document.querySelector(".cardContainer");
-    
+
     if (!cardContainer) {
         console.error("❌ cardContainer NOT FOUND!");
-        return; // Stop execution if cardContainer is missing
+        return;
     }
 
     console.log("✅ cardContainer found!", cardContainer);
@@ -212,9 +217,9 @@ async function displayAlbums() {
 
     for (const albumKey in albumsManifest) {
         const album = albumsManifest[albumKey];
-        
-        console.log(`🎵 Adding album: ${albumKey}`, album); // Debug each album
-        
+
+        console.log(`🎵 Adding album: ${albumKey}`, album);
+
         cardContainer.innerHTML += `
         <div data-folder="${albumKey}" class="card">
             <div class="play">
@@ -223,7 +228,7 @@ async function displayAlbums() {
                     <path d="M18 34V14L34 24L18 34Z" fill="black" />
                 </svg>
             </div>
-            <img src="./songs/${albumKey}/cover.jpg" alt="${album.title}">
+            <img src="songs/${albumKey}/cover.jpg" alt="${album.title}">
             <h2>${album.title}</h2>
             <p>${album.artist}</p>
         </div>`;
@@ -231,40 +236,42 @@ async function displayAlbums() {
 
     console.log("✅ Finished adding albums. Total:", Object.keys(albumsManifest).length);
 
-    // ✅ Check if album cards exist after being added
-    const cards = document.querySelectorAll(".card");
-    console.log("📌 Total album cards in DOM:", cards.length);
-
     // ✅ Attach event listener **AFTER** dynamically adding cards
     document.querySelectorAll(".card").forEach((card) => {
         card.addEventListener("click", async (event) => {
             let folder = event.currentTarget.dataset.folder;
             console.log(`📂 Loading songs from: ${folder}`);
-            await getSongs(`songs/${folder}`);
-            songs = [...songsList]; // Update songs list
-            playMusic(songs[0]); // Play the first song
+            await getSongs(folder);
+            songs = [...songsList];
+            playMusic(songs[0]);
         });
     });
 }
 
 
-async function main() {
-  console.log("Albums Manifest:", albumsManifest);
-    console.log("📢 Checking if main() is running...");
-    console.log("✅ main() started");
-    await getSongs(`/songs/Glory/`);
-  songs = [...songsList];
-    console.log("🎵 Songs Loaded:", songs); // Debugging songs array
 
-    if (!songs.length) {
-        console.warn("⚠️ No songs found, stopping execution!");
-        return;
+async function main() {
+    console.log("📢 Checking if main() is running...");
+
+    try {
+        await displayAlbums(); // ✅ Display albums dynamically
+        await getSongs("Glory"); // ✅ Load a default album
+
+        songs = [...songsList];
+
+        if (!songs.length) {
+            console.warn("⚠️ No songs found, stopping execution!");
+            return;
+        }
+
+        playMusic(songs[0], true); // Stop autoplay
+
+    } catch (error) {
+        console.error("❌ Error in main():", error);
     }
 
-    playMusic(songs[0], true); // Stop autoplay
 
-    console.log("📌 Calling displayAlbums() now...");
-    displayAlbums();
+
   document.querySelector("#play").addEventListener("click", () => {
     if (currentSong.paused) {
       currentSong.play();
