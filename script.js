@@ -1,7 +1,7 @@
 // Current song
 let songsList = [];
 let songs = [];
-let currfolder;
+let currfolder ;
 let currentSong = new Audio();
 
 console.log("code running");
@@ -80,6 +80,8 @@ function formatTime(seconds) {
 
 
 async function getSongs(folder) {
+  currfolder = folder;
+
     console.log(`📂 Fetching songs from: ${folder}`);
 
     try {
