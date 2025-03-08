@@ -4,6 +4,71 @@ let songs = [];
 let currfolder;
 let currentSong = new Audio();
 
+//  manifest for songs and album metadata
+const songsManifest = {
+  "songs/Glory": [
+      "Bonita - Yo Yo Honey Singh, The Shams.mp3",
+      "Jatt Mehkma - Yo Yo Honey Singh, Leo Grewal.mp3",
+      "Maniac - Yo Yo Honey Singh.mp3",
+      "Millionaire-Yo Yo Honey Singh, Leo Grewal.mp3",
+      "Payal - Yo Yo Honey Singh, Paradox,.mp3",
+      "Rap God - Honey Singh.mp3"
+  ],
+  "Divine": [
+      "100 Million - DIVINE Karan Aujla.mp3",
+      "Hisaab - DIVINE Karan Aujla.mp3",
+      "Nothing Lasts - DIVINE Karan Aujla.mp3",
+      "Straight Ballin - DIVINE Karan Aujla.mp3",
+      "Top Class  Overseas - DIVINE Karan Aujla.mp3",
+      
+  ],
+  "yjhd": [
+      "Balam Pichkari.mp3",
+      "Badtameez Dil - Benny Dayal Shefali Alvares.mp3",
+      "Diliwali Girlfriends.mp3",
+      "ILAHI - Arijit Singh, Pritam, Amitbh Bhattacharya.mp3",
+      "Kabira - Tochi Raina Rekha Bhardwaj.mp3",
+  ],
+  "Krsna":[
+    "Hola Amigo - KRNA, Seedhe Maut, Umair.mp3",
+    "KRNA, Flexus, KRNA, Flexus - Blowing Up.mp3",
+    "KRNA, KRNA, KRNA, Enigma - No Cap.mp3",
+    "KRNA, KRNA, KRNA, Kabu Beats - I Guess.mp3",
+
+
+  ],
+
+
+};
+
+const albumsManifest = {
+  "Glory": {
+          "title": "Glory",
+          "artist": "YO Yo Honey Singh",
+          "album": "Glory",
+          "imgCover": "/Glory-cover.webp"
+
+
+  },
+  "Krsna": {
+    "title": "FAR FROM OVER",
+    "artist": "KR$NA",
+    "album": "NGL",
+    "imgCover": "/Krsna.webp"
+  },
+  "Divine": {
+    "title": "Street Dreams",
+    "artist": "Divine",
+    "album": "Street Dreams",
+    "imgCover": "/streetDreams.webp",
+  },
+  "yjhd": {
+    "title": "Yeh Jawaani Hai Deewani",
+    "artist": "Pritam",
+    "album": "Yeh Jawaani Hai Deewani",
+    "imgCover": "/yjhd-cover.webp",
+  },
+};
 function formatTime(seconds) {
   if (isNaN(seconds) || seconds < 0) return "00:00";
   let minutes = Math.floor(seconds / 60);
@@ -13,70 +78,43 @@ function formatTime(seconds) {
 
 async function getSongs(folder) {
   currfolder = folder;
-  let as = await fetch(`/songs/${folder}/`);
-  let response = await as.text();
-  let div = document.createElement("div");
-  div.innerHTML = response;
-  let listItems = div.getElementsByTagName("li");
-  songsList = [];
-
-  for (let li of listItems) {
-    let anchor = li.querySelector("a");
-    if (anchor) {
-      let songName = decodeURIComponent(anchor.href.split("/").pop());
-
-      // ✅ Filter out non-song items
-      if (
-        songName.toLowerCase().endsWith(".mp3") ||
-        songName.toLowerCase().endsWith(".wav")
-      ) {
-        songsList.push(songName);
-      }
-    }
-  }
-
-  // ✅ Prevent empty entries
-  songsList = songsList.filter((song) => song.trim() !== "");
+  songsList = songsManifest[folder] || [];  // ✅ Changed: Fetch songs from the songsManifest instead of using fetch()
 
   let songUl = document.querySelector(".songList ul");
   songUl.innerHTML = ""; // Clear previous list
 
   for (const song of songsList) {
-    songUl.innerHTML += `
-      <li class="song-item">
-        <img class="invert music" src="svgs/music.svg" alt="">
-        <div class="info">
-          <div class="song-name">${song}</div>
-          
-        </div>
-        <div class="playnow">
-          
-          <img id="#play" class="invert play-btn" src="svgs/play.svg" alt="">
-        </div>
-      </li>`;
+      songUl.innerHTML += `
+        <li class="song-item">
+          <img class="invert music" src="svgs/music.svg" alt="">
+          <div class="info">
+            <div class="song-name">${song}</div>
+          </div>
+          <div class="playnow">
+            <img class="invert play-btn" src="svgs/play.svg" alt="">
+          </div>
+        </li>`;
   }
 
-  // Attach event listeners after updating the list
+  // ✅ Attach event listeners after updating the list
   document.querySelectorAll(".song-item").forEach((item) => {
-    item.addEventListener("click", () => {
-      let songName = item.querySelector(".song-name").innerText.trim();
-      // Check if it's the same song and toggle pause/play
-      if (currentSong.src.includes(songName)) {
-        if (currentSong.paused) {
-          currentSong.play();
-          document.querySelector("#play").src = "svgs/pause.svg";
-          item.querySelector(".play-btn").src = "svgs/pause.svg";
-        } else {
-          currentSong.pause();
-          document.querySelector("#play").src = "svgs/play.svg";
-          item.querySelector(".play-btn").src = "svgs/play.svg";
-        }
-      } else {
-        playMusic(songName); // Start new song
-      }
-    });
+      item.addEventListener("click", () => {
+          let songName = item.querySelector(".song-name").innerText.trim();
+          if (currentSong.src.includes(songName)) {
+              if (currentSong.paused) {
+                  currentSong.play();
+                  item.querySelector(".play-btn").src = "svgs/pause.svg";
+              } else {
+                  currentSong.pause();
+                  item.querySelector(".play-btn").src = "svgs/play.svg";
+              }
+          } else {
+              playMusic(songName);
+          }
+      });
   });
 }
+
 
 // Attach event listener to each song item
 document.querySelectorAll(".song-item").forEach((item) => {
